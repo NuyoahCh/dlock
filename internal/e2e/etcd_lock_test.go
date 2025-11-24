@@ -70,22 +70,22 @@ func TestGrant(t *testing.T) {
 	fmt.Printf("Created lease ID: %x (not attached to any key)\n", leaseID)
 
 	// 启动续约
-	//keepAliveCh, err := lease.KeepAlive(context.TODO(), leaseID)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//// 监控续约响应
-	//go func() {
-	//	for ka := range keepAliveCh {
-	//		if ka == nil {
-	//			fmt.Println("Lease expired or cancelled")
-	//			return
-	//		}
-	//		fmt.Printf("Lease kept alive at %s: ID=%x, TTL=%d\n",
-	//			time.Now().Format("15:04:05"), ka.ID, ka.TTL)
-	//	}
-	//}()
+	keepAliveCh, err := lease.KeepAlive(context.TODO(), leaseID)
+	if err != nil {
+		panic(err)
+	}
+
+	// 监控续约响应
+	go func() {
+		for ka := range keepAliveCh {
+			if ka == nil {
+				fmt.Println("Lease expired or cancelled")
+				return
+			}
+			fmt.Printf("Lease kept alive at %s: ID=%x, TTL=%d\n",
+				time.Now().Format("15:04:05"), ka.ID, ka.TTL)
+		}
+	}()
 
 	// 定期检查租约状态
 	ticker := time.NewTicker(3 * time.Second)
